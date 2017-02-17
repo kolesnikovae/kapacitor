@@ -982,7 +982,7 @@ func (s *Service) createHandlerActionFromSpec(spec HandlerActionSpec) (ha handle
 		if err != nil {
 			return nil, err
 		}
-		ha = newPassThroughHandler(h)
+		ha = newPassThroughHandler(newExternalHandler(h))
 	case "exec":
 		c := ExecHandlerConfig{
 			Commander: s.Commander,
@@ -992,7 +992,7 @@ func (s *Service) createHandlerActionFromSpec(spec HandlerActionSpec) (ha handle
 			return
 		}
 		h := NewExecHandler(c, s.logger)
-		ha = newPassThroughHandler(h)
+		ha = newPassThroughHandler(newExternalHandler(h))
 	case "hipchat":
 		c := hipchat.HandlerConfig{}
 		err = decodeOptions(spec.Options, &c)
@@ -1000,7 +1000,7 @@ func (s *Service) createHandlerActionFromSpec(spec HandlerActionSpec) (ha handle
 			return
 		}
 		h := s.HipChatService.Handler(c, s.logger)
-		ha = newPassThroughHandler(h)
+		ha = newPassThroughHandler(newExternalHandler(h))
 	case "log":
 		c := DefaultLogHandlerConfig()
 		err = decodeOptions(spec.Options, &c)
@@ -1011,7 +1011,7 @@ func (s *Service) createHandlerActionFromSpec(spec HandlerActionSpec) (ha handle
 		if err != nil {
 			return nil, err
 		}
-		ha = newPassThroughHandler(h)
+		ha = newPassThroughHandler(newExternalHandler(h))
 	case "opsgenie":
 		c := opsgenie.HandlerConfig{}
 		err = decodeOptions(spec.Options, &c)
@@ -1019,7 +1019,7 @@ func (s *Service) createHandlerActionFromSpec(spec HandlerActionSpec) (ha handle
 			return
 		}
 		h := s.OpsGenieService.Handler(c, s.logger)
-		ha = newPassThroughHandler(h)
+		ha = newPassThroughHandler(newExternalHandler(h))
 	case "pagerduty":
 		c := pagerduty.HandlerConfig{}
 		err = decodeOptions(spec.Options, &c)
@@ -1027,7 +1027,7 @@ func (s *Service) createHandlerActionFromSpec(spec HandlerActionSpec) (ha handle
 			return
 		}
 		h := s.PagerDutyService.Handler(c, s.logger)
-		ha = newPassThroughHandler(h)
+		ha = newPassThroughHandler(newExternalHandler(h))
 	case "post":
 		c := PostHandlerConfig{}
 		err = decodeOptions(spec.Options, &c)
@@ -1035,7 +1035,7 @@ func (s *Service) createHandlerActionFromSpec(spec HandlerActionSpec) (ha handle
 			return
 		}
 		h := NewPostHandler(c, s.logger)
-		ha = newPassThroughHandler(h)
+		ha = newPassThroughHandler(newExternalHandler(h))
 	case "publish":
 		c := PublishHandlerConfig{
 			topics: s.topics,
@@ -1048,7 +1048,7 @@ func (s *Service) createHandlerActionFromSpec(spec HandlerActionSpec) (ha handle
 		ha = newPassThroughHandler(h)
 	case "sensu":
 		h := s.SensuService.Handler(s.logger)
-		ha = newPassThroughHandler(h)
+		ha = newPassThroughHandler(newExternalHandler(h))
 	case "slack":
 		c := slack.HandlerConfig{}
 		err = decodeOptions(spec.Options, &c)
@@ -1056,7 +1056,7 @@ func (s *Service) createHandlerActionFromSpec(spec HandlerActionSpec) (ha handle
 			return
 		}
 		h := s.SlackService.Handler(c, s.logger)
-		ha = newPassThroughHandler(h)
+		ha = newPassThroughHandler(newExternalHandler(h))
 	case "smtp":
 		c := smtp.HandlerConfig{}
 		err = decodeOptions(spec.Options, &c)
@@ -1064,7 +1064,7 @@ func (s *Service) createHandlerActionFromSpec(spec HandlerActionSpec) (ha handle
 			return
 		}
 		h := s.SMTPService.Handler(c, s.logger)
-		ha = newPassThroughHandler(h)
+		ha = newPassThroughHandler(newExternalHandler(h))
 	case "snmptrap":
 		c := snmptrap.HandlerConfig{}
 		err = decodeOptions(spec.Options, &c)
@@ -1075,7 +1075,7 @@ func (s *Service) createHandlerActionFromSpec(spec HandlerActionSpec) (ha handle
 		if err != nil {
 			return nil, err
 		}
-		ha = newPassThroughHandler(h)
+		ha = newPassThroughHandler(newExternalHandler(h))
 	case "stateChangesOnly":
 		c := StateChangesOnlyHandlerConfig{
 			topics: s.topics,
@@ -1083,7 +1083,7 @@ func (s *Service) createHandlerActionFromSpec(spec HandlerActionSpec) (ha handle
 		ha = NewStateChangesOnlyHandler(c, s.logger)
 	case "talk":
 		h := s.TalkService.Handler(s.logger)
-		ha = newPassThroughHandler(h)
+		ha = newPassThroughHandler(newExternalHandler(h))
 	case "tcp":
 		c := TCPHandlerConfig{}
 		err = decodeOptions(spec.Options, &c)
@@ -1091,7 +1091,7 @@ func (s *Service) createHandlerActionFromSpec(spec HandlerActionSpec) (ha handle
 			return
 		}
 		h := NewTCPHandler(c, s.logger)
-		ha = newPassThroughHandler(h)
+		ha = newPassThroughHandler(newExternalHandler(h))
 	case "telegram":
 		c := telegram.HandlerConfig{}
 		err = decodeOptions(spec.Options, &c)
@@ -1099,7 +1099,7 @@ func (s *Service) createHandlerActionFromSpec(spec HandlerActionSpec) (ha handle
 			return
 		}
 		h := s.TelegramService.Handler(c, s.logger)
-		ha = newPassThroughHandler(h)
+		ha = newPassThroughHandler(newExternalHandler(h))
 	case "victorops":
 		c := victorops.HandlerConfig{}
 		err = decodeOptions(spec.Options, &c)
@@ -1107,7 +1107,7 @@ func (s *Service) createHandlerActionFromSpec(spec HandlerActionSpec) (ha handle
 			return
 		}
 		h := s.VictorOpsService.Handler(c, s.logger)
-		ha = newPassThroughHandler(h)
+		ha = newPassThroughHandler(newExternalHandler(h))
 	default:
 		err = fmt.Errorf("unsupported action kind %q", spec.Kind)
 	}
@@ -1141,3 +1141,21 @@ func (h *passThroughHandler) Close() {
 type noopHandler struct{}
 
 func (h noopHandler) Handle(event alert.Event) {}
+
+// ExternalHandler wraps an existing handler that calls out to external services.
+// The events are checked for the NoExternal flag before being passed onto the external handler.
+type externalHandler struct {
+	h alert.Handler
+}
+
+func (h *externalHandler) Handle(event alert.Event) {
+	if !event.NoExternal {
+		h.h.Handle(event)
+	}
+}
+
+func newExternalHandler(h alert.Handler) *externalHandler {
+	return &externalHandler{
+		h: h,
+	}
+}
